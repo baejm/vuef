@@ -11,7 +11,7 @@
       <v-card-title>로그인</v-card-title>
       <v-divider></v-divider>
       <v-card-actions>
-        <v-btn color="red" dark
+        <v-btn color="red" dark @click="signInWithGoogle"
           ><v-icon left>mdi-google</v-icon>구글 로그인</v-btn
         >
       </v-card-actions>
@@ -20,7 +20,29 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      loading: false
+    };
+  },
+  methods: {
+    async signInWithGoogle() {
+      const provider = new this.$firebase.auth.GoogleAuthProvider();
+      this.$firebase.auth().languageCode = "ko";
+      this.loading = true;
+      try {
+        const sn = await this.$firebase.auth().signInWithPopup(provider);
+        console.log(sn.user);
+      } finally {
+        this.loading = false;
+      }
+    },
+    signOut() {
+      this.$firebase.auth().signOut();
+    }
+  }
+};
 </script>
 
 <style></style>
