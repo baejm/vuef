@@ -1,49 +1,123 @@
 <template>
   <v-app>
     <v-app-bar app color="primary" dark>
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <top-nav :title="title"></top-nav>
-      <v-spacer></v-spacer>
-      <v-btn icon to="/about">
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
+      <v-app-bar-nav-icon @click="drawer = !drawer" />
+      <TopNav :title="site.title"></TopNav>
+      <v-spacer />
     </v-app-bar>
     <v-navigation-drawer app v-model="drawer">
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title class="title">
-            Application
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            subtext
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-      <v-divider></v-divider>
-      <Menu></Menu>
+      <Menu :items="site.menu"></Menu>
     </v-navigation-drawer>
     <v-content>
-      <router-view></router-view>
+      <router-view />
     </v-content>
-    <Footer :footer="footer"></Footer>
+    <Footer :footer="site.footer"></Footer>
   </v-app>
 </template>
 
 <script>
-import Footer from "./components/common/Footer.vue";
-import Menu from "./components/common/Menu.vue";
-import TopNav from "./components/common/TopNav.vue";
+import TopNav from "@/components/common/TopNav";
+import Footer from "@/components/common/Footer";
+import Menu from "@/components/common/Menu";
+
 export default {
-  components: { TopNav, Footer, Menu },
+  components: { Menu, Footer, TopNav },
   name: "App",
   data() {
     return {
-      title: "타이틀",
-      footer: "발",
-      drawer: false
+      drawer: false,
+      site: {
+        menu: [
+          {
+            title: "home",
+            active: true,
+            icon: "mdi-home",
+            subItems: [
+              {
+                title: "Dashboard",
+                to: "/"
+              },
+              {
+                title: "About",
+                to: "/about"
+              }
+            ]
+          },
+          {
+            title: "about",
+            icon: "mdi-account",
+            subItems: [
+              {
+                title: "xxx",
+                to: "/xxx"
+              }
+            ]
+          }
+        ],
+        title: "나의 타이틀입니다",
+        footer: "푸터입니다"
+      }
     };
+  },
+  created() {
+    this.subscribe();
+  },
+  methods: {
+    subscribe() {
+      this.$firebase
+        .database()
+        .ref()
+        .child("site")
+        .on(
+          "value",
+          sn => {
+            const v = sn.val();
+            if (!v) {
+              this.$firebase
+                .database()
+                .ref()
+                .child("site")
+                .set(this.site);
+              return;
+            }
+            this.site = v;
+          },
+          e => {
+            console.log(e.message);
+          }
+        );
+    },
+    save() {
+      console.log("save@@@");
+      this.$firebase
+        .database()
+        .ref()
+        .child("abcd")
+        .child("abcd")
+        .child("abcd")
+        .set({
+          title: "abcd",
+          text: "tttttt"
+        });
+    },
+    read() {
+      this.$firebase
+        .database()
+        .ref()
+        .child("abcd")
+        .on("value", sn => {
+          console.log(sn);
+          console.log(sn.val());
+        });
+    },
+    async readOne() {
+      const sn = await this.$firebase
+        .database()
+        .ref()
+        .child("abcd")
+        .once("value");
+      console.log(sn.val());
+    }
   }
 };
 </script>
-
-<style></style>

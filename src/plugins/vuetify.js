@@ -1,6 +1,19 @@
 import Vue from "vue";
-import Vuetify from "vuetify/lib/framework";
+import Vuetify, { VSnackbar } from "vuetify/lib";
+import VuetifyToast from "vuetify-toast-snackbar";
 
-Vue.use(Vuetify);
+Vue.use(Vuetify, {
+  components: {
+    VSnackbar
+  }
+});
 
-export default new Vuetify({});
+const opts = {}; // your options
+
+const vueObj = new Vuetify(opts);
+
+export default vueObj;
+
+Vue.use(VuetifyToast, {
+  $vuetify: vueObj.framework
+});
