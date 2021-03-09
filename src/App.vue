@@ -4,6 +4,7 @@
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <TopNav :title="site.title"></TopNav>
       <v-spacer />
+      <Sign></Sign>
     </v-app-bar>
     <v-navigation-drawer app v-model="drawer">
       <Menu :items="site.menu"></Menu>
@@ -19,9 +20,10 @@
 import TopNav from "@/components/common/TopNav";
 import Footer from "@/components/common/Footer";
 import Menu from "@/components/common/Menu";
+import Sign from "./components/common/Sign.vue";
 
 export default {
-  components: { Menu, Footer, TopNav },
+  components: { Menu, Footer, TopNav, Sign },
   name: "App",
   data() {
     return {
@@ -84,6 +86,7 @@ export default {
           },
           e => {
             console.log(e.message);
+            return;
           }
         );
     },
