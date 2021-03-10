@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title>board test</v-card-title>
     <v-data-table :headers="headers" :items="items" :items-per-page="5">
-      <template v-slot:item.id="{ item }">
+      <template v-slot:[`item._id`]="{ item }">
         <v-btn icon @click="openDialog(item)"
           ><v-icon>mdi-pencil</v-icon></v-btn
         >
