@@ -44,6 +44,9 @@
                   v-if="i < items.length - 1"
                   ><v-icon>mdi-chevron-double-down</v-icon></v-btn
                 >
+                <v-btn icon @click="removeItem(items, i)">
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
               </span>
             </v-list-item-title>
           </v-list-item-content>
@@ -70,6 +73,9 @@
                   v-if="j < item.subItems.length - 1"
                   ><v-icon>mdi-chevron-double-down</v-icon></v-btn
                 >
+                <v-btn icon @click="removeItem(item.subItems, j)">
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
               </span>
             </v-list-item-title>
           </v-list-item-content>
@@ -253,6 +259,10 @@ export default {
       // const item = items.splice(i, 1)[0];
       // items.splice(i + arrow, 0, item);
       items.splice(i + arrow, 0, ...items.splice(i, 1));
+      this.save();
+    },
+    removeItem(items, i) {
+      items.splice(i, 1);
       this.save();
     }
   }

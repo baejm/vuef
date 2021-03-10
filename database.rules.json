@@ -1,6 +1,8 @@
 {
   "rules": {
-    ".read": "now < 1617807600000",  // 2021-4-8
-    ".write": "now < 1617807600000",  // 2021-4-8 
+    ".read": true,     
+    "site" : {
+      ".write" : "root.child('users').child(auth.uid).child('level').val() == 0 "
+    }
   }
 }
