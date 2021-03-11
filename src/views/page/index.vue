@@ -1,5 +1,5 @@
 <template>
-  <v-card>board list</v-card>
+  <v-card>page list</v-card>
 </template>
 
 <script>

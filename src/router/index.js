@@ -17,11 +17,6 @@ const routes = [
       import(/* webpackChunkName: "about" */ "../views/About.vue")
   },
   {
-    path: "/xxx",
-    name: "xxxx",
-    component: () => import("../views/xxx.vue")
-  },
-  {
     path: "/board",
     name: "board",
     component: () => import("../views/board/")
@@ -30,6 +25,16 @@ const routes = [
     path: "/editor",
     name: "editor",
     component: () => import("../views/editor")
+  },
+  {
+    path: "/:collection/:document",
+    name: "collection-document",
+    component: () => import("@/components/common/renderer")
+  },
+  {
+    path: "*",
+    name: "PageNotFound",
+    component: () => import("../views/PageNotFound")
   },
   {
     path: "/storage",
