@@ -4,8 +4,14 @@
       <v-toolbar color="accent" dense flat dark>
         <v-toolbar-title v-text="info.title"></v-toolbar-title>
         <v-spacer />
-        <v-btn icon @click="write"><v-icon>mdi-pencil</v-icon></v-btn>
-        <v-btn icon @click="articleWrite"><v-icon>mdi-plus</v-icon></v-btn>
+        <template v-if="user">
+          <v-btn icon @click="write" :disabled="user.level > 0"
+            ><v-icon>mdi-pencil</v-icon></v-btn
+          >
+          <v-btn icon @click="articleWrite" :disabled="user.level > 4"
+            ><v-icon>mdi-plus</v-icon></v-btn
+          >
+        </template>
       </v-toolbar>
       <v-card-text v-if="info.createdAt">
         <v-alert color="info" outlined dismissible>
@@ -18,9 +24,7 @@
           </div>
         </v-alert>
       </v-card-text>
-      <v-card-text>
-        <board-article :info="info" :document="document"></board-article>
-      </v-card-text>
+      <board-article :info="info" :document="document"></board-article>
     </v-card>
   </v-container>
 </template>
@@ -45,6 +49,11 @@ export default {
       this.subscribe();
     }
   },
+  computed: {
+    user() {
+      return this.$store.state.user;
+    }
+  },
   created() {
     this.subscribe();
   },
@@ -61,7 +70,6 @@ export default {
       this.unsubscribe = ref.onSnapshot(doc => {
         if (!doc.exists) return this.write();
         this.info = doc.data();
-        console.log("넘어옴", this.info);
       });
     },
     async write() {

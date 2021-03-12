@@ -12,23 +12,35 @@ const fdb = admin.firestore();
 
 exports.createUser = functions.auth.user().onCreate(async user => {
   const { uid, email, displayName, photoURL } = user;
+  const time = new Date();
   const u = {
     email,
     displayName,
     photoURL,
-    createAt: new Date().getMilliseconds(),
+    createdAt: time,
     level: email === functions.config().admin.email ? 0 : 5
   };
-  db.ref("users")
+  await fdb
+    .collection("users")
+    .doc(uid)
+    .set(u);
+  u.createdAt = time.getTime();
+  await db
+    .ref("users")
     .child(uid)
     .set(u);
 });
 
 exports.deleteUser = functions.auth.user().onDelete(async user => {
   const { uid } = user;
-  db.ref("users")
+  await db
+    .ref("users")
     .child(uid)
     .remove();
+  await fdb
+    .collection("users")
+    .doc(uid)
+    .delete();
 });
 
 exports.incrementBoardCount = functions.firestore
