@@ -19,13 +19,15 @@
         </v-alert>
       </v-card-text>
       <v-card-text>
-        articles
+        <board-article :info="info" :document="document"></board-article>
       </v-card-text>
     </v-card>
   </v-container>
 </template>
 <script>
+import BoardArticle from "./article/index";
 export default {
+  components: { BoardArticle },
   props: ["document"],
   data() {
     return {
