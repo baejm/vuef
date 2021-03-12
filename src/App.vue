@@ -2,125 +2,81 @@
   <v-app>
     <v-app-bar app color="primary" dark>
       <v-app-bar-nav-icon @click="drawer = !drawer" />
-      <TopNav :title="site.title"></TopNav>
-      <v-spacer />
-      <Sign></Sign>
+      <site-title :title="site.title"></site-title>
+      <v-spacer/>
+      <site-sign></site-sign>
     </v-app-bar>
-    <v-navigation-drawer app v-model="drawer">
-      <Menu :items="site.menu"></Menu>
+    <v-navigation-drawer app v-model="drawer" width="400">
+      <site-menu :items="site.menu"></site-menu>
     </v-navigation-drawer>
     <v-content>
-      <router-view />
+      <router-view/>
     </v-content>
-    <Footer :footer="site.footer"></Footer>
+    <site-footer :footer="site.footer"></site-footer>
   </v-app>
 </template>
 
 <script>
-import TopNav from "@/components/common/TopNav";
-import Footer from "@/components/common/Footer";
-import Menu from "@/components/common/Menu";
-import Sign from "./components/common/Sign.vue";
+import SiteTitle from '@/views/site/title'
+import SiteFooter from '@/views/site/footer'
+import SiteMenu from '@/views/site/menu'
+import SiteSign from '@/views/site/sign'
 
 export default {
-  components: { Menu, Footer, TopNav, Sign },
-  name: "App",
-  data() {
+  components: { SiteTitle, SiteFooter, SiteMenu, SiteSign },
+  name: 'App',
+  data () {
     return {
       drawer: false,
       site: {
         menu: [
           {
-            title: "home",
-            active: true,
-            icon: "mdi-home",
+            title: 'home',
+            icon: 'mdi-home',
             subItems: [
               {
-                title: "Dashboard",
-                to: "/"
+                title: 'Dashboard',
+                to: '/'
               },
               {
-                title: "About",
-                to: "/about"
+                title: 'About',
+                to: '/about'
               }
             ]
           },
           {
-            title: "about",
-            icon: "mdi-account",
+            title: 'about',
+            active: true,
+            icon: 'mdi-account',
             subItems: [
               {
-                title: "xxx",
-                to: "/xxx"
+                title: 'xxx',
+                to: '/xxx'
               }
             ]
           }
         ],
-        title: "나의 타이틀입니다",
-        footer: "푸터입니다"
+        title: '나의 타이틀입니다',
+        footer: '푸터입니다'
       }
-    };
+    }
   },
-  created() {
-    this.subscribe();
+  created () {
+    this.subscribe()
   },
   methods: {
-    subscribe() {
-      this.$firebase
-        .database()
-        .ref()
-        .child("site")
-        .on(
-          "value",
-          sn => {
-            const v = sn.val();
-            if (!v) {
-              this.$firebase
-                .database()
-                .ref()
-                .child("site")
-                .set(this.site);
-              return;
-            }
-            this.site = v;
-          },
-          e => {
-            console.log(e.message);
-            return;
-          }
-        );
-    },
-    save() {
-      console.log("save@@@");
-      this.$firebase
-        .database()
-        .ref()
-        .child("abcd")
-        .child("abcd")
-        .child("abcd")
-        .set({
-          title: "abcd",
-          text: "tttttt"
-        });
-    },
-    read() {
-      this.$firebase
-        .database()
-        .ref()
-        .child("abcd")
-        .on("value", sn => {
-          console.log(sn);
-          console.log(sn.val());
-        });
-    },
-    async readOne() {
-      const sn = await this.$firebase
-        .database()
-        .ref()
-        .child("abcd")
-        .once("value");
-      console.log(sn.val());
+    subscribe () {
+      this.$firebase.database().ref().child('site').on('value', (sn) => {
+        const v = sn.val()
+        if (!v) {
+          this.$firebase.database().ref().child('site').set(this.site)
+          return
+        }
+        this.site = v
+      }, (e) => {
+        console.log(e.message)
+      })
     }
   }
-};
+}
 </script>

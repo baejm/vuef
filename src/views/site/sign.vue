@@ -6,16 +6,12 @@
     </template>
     <v-card>
       <v-card-title>로그인</v-card-title>
-      <v-divider />
+      <v-divider/>
       <v-card-actions>
-        <v-btn color="red" dark @click="signInWithGoogle" block
-          ><v-icon left>mdi-google</v-icon> 구글로 로그인</v-btn
-        >
+        <v-btn color="red" dark @click="signInWithGoogle" block><v-icon left>mdi-google</v-icon> 구글로 로그인</v-btn>
       </v-card-actions>
       <v-card-actions>
-        <v-btn color="blue" dark @click="signInWithFacebook" block
-          ><v-icon left>mdi-facebook</v-icon> 페이스북으로 로그인</v-btn
-        >
+        <v-btn color="blue" dark @click="signInWithFacebook" block><v-icon left>mdi-facebook</v-icon> 페이스북으로 로그인</v-btn>
       </v-card-actions>
     </v-card>
   </v-menu>
@@ -37,29 +33,29 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     return {
       loading: false
-    };
+    }
   },
   methods: {
-    async signInWithGoogle() {
-      const provider = new this.$firebase.auth.GoogleAuthProvider();
-      this.$firebase.auth().languageCode = "ko";
-      this.loading = true;
+    async signInWithGoogle () {
+      const provider = new this.$firebase.auth.GoogleAuthProvider()
+      this.$firebase.auth().languageCode = 'ko'
+      this.loading = true
       try {
-        const sn = await this.$firebase.auth().signInWithPopup(provider);
-        this.$store.commit("setFireUser", sn.user);
+        const sn = await this.$firebase.auth().signInWithPopup(provider)
+        this.$store.commit('setFireUser', sn.user)
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
-    signOut() {
-      this.$firebase.auth().signOut();
+    signOut () {
+      this.$firebase.auth().signOut()
     },
-    signInWithFacebook() {
-      throw Error("나중에 만들께요");
+    signInWithFacebook () {
+      throw Error('나중에 만들께요')
     }
   }
-};
+}
 </script>

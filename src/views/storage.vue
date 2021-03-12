@@ -1,11 +1,10 @@
 <template>
   <v-sheet>
-    <v-textarea v-model="text"></v-textarea>
+    <v-textarea v-model="text"> </v-textarea>
     <v-btn @click="read">read</v-btn>
     <v-btn @click="write">write</v-btn>
   </v-sheet>
 </template>
-
 <script>
 import axios from "axios";
 
@@ -22,7 +21,7 @@ export default {
         .storage()
         .ref()
         .child("xxx.text")
-        .putString("abc");
+        .putString("abcd");
       const url = await sn.ref.getDownloadURL();
       this.url = url;
     },
@@ -34,5 +33,3 @@ export default {
   }
 };
 </script>
-
-<style></style>
