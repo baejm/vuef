@@ -11,7 +11,9 @@
       </v-list-item-content>
       <v-list-item-action>
         <v-btn @click="$store.commit('setEdit', !$store.state.editable)" icon>
-          <v-icon v-text="$store.state.editable ? 'mdi-eye' : 'mdi-pencil'"></v-icon>
+          <v-icon
+            v-text="$store.state.editable ? 'mdi-eye' : 'mdi-pencil'"
+          ></v-icon>
         </v-btn>
       </v-list-item-action>
     </v-list-item>
@@ -30,10 +32,21 @@
             <v-list-item-title>
               {{ item.title }}
               <span v-if="$store.state.editable">
-                <v-btn icon @click="openDialogItem(i)"><v-icon>mdi-pencil</v-icon></v-btn>
-                <v-btn icon @click="moveItem(items, i, -1)" v-if="i > 0"><v-icon>mdi-chevron-double-up</v-icon></v-btn>
-                <v-btn icon @click="moveItem(items, i, 1)" v-if="i < items.length - 1"><v-icon>mdi-chevron-double-down</v-icon></v-btn>
-                <v-btn icon @click="removeItem(items, i)"><v-icon>mdi-delete</v-icon></v-btn>
+                <v-btn icon @click="openDialogItem(i)"
+                  ><v-icon>mdi-pencil</v-icon></v-btn
+                >
+                <v-btn icon @click="moveItem(items, i, -1)" v-if="i > 0"
+                  ><v-icon>mdi-chevron-double-up</v-icon></v-btn
+                >
+                <v-btn
+                  icon
+                  @click="moveItem(items, i, 1)"
+                  v-if="i < items.length - 1"
+                  ><v-icon>mdi-chevron-double-down</v-icon></v-btn
+                >
+                <v-btn icon @click="removeItem(items, i)"
+                  ><v-icon>mdi-delete</v-icon></v-btn
+                >
               </span>
             </v-list-item-title>
           </v-list-item-content>
@@ -45,22 +58,38 @@
           :to="$store.state.editable ? null : subItem.to"
         >
           <v-list-item-content>
-            <v-list-item-title :class="$store.state.editable ? 'pl-4':''">
+            <v-list-item-title :class="$store.state.editable ? 'pl-4' : ''">
               {{ subItem.title }}
               <span v-if="$store.state.editable">
-                <v-btn icon @click="openDialogSubItem(i, j)"><v-icon>mdi-pencil</v-icon></v-btn>
-                <v-btn icon @click="moveItem(item.subItems, j, -1)" v-if="j > 0"><v-icon>mdi-chevron-double-up</v-icon></v-btn>
-                <v-btn icon @click="moveItem(item.subItems, j, 1)" v-if="j < item.subItems.length - 1"><v-icon>mdi-chevron-double-down</v-icon></v-btn>
-                <v-btn icon @click="removeItem(item.subItems, j)"><v-icon>mdi-delete</v-icon></v-btn>
+                <v-btn icon @click="openDialogSubItem(i, j)"
+                  ><v-icon>mdi-pencil</v-icon></v-btn
+                >
+                <v-btn icon @click="moveItem(item.subItems, j, -1)" v-if="j > 0"
+                  ><v-icon>mdi-chevron-double-up</v-icon></v-btn
+                >
+                <v-btn
+                  icon
+                  @click="moveItem(item.subItems, j, 1)"
+                  v-if="j < item.subItems.length - 1"
+                  ><v-icon>mdi-chevron-double-down</v-icon></v-btn
+                >
+                <v-btn icon @click="removeItem(item.subItems, j)"
+                  ><v-icon>mdi-delete</v-icon></v-btn
+                >
               </span>
             </v-list-item-title>
           </v-list-item-content>
           <v-list-item-action v-if="$store.state.editable">
-            <v-btn icon :to="subItem.to" exact><v-icon>mdi-arrow-right-bold-circle-outline</v-icon></v-btn>
+            <v-btn icon :to="subItem.to" exact
+              ><v-icon>mdi-arrow-right-bold-circle-outline</v-icon></v-btn
+            >
           </v-list-item-action>
         </v-list-item>
-        <v-list-item @click="openDialogSubItem(i, -1)" v-if="$store.state.editable">
-          <v-list-item-icon :class="$store.state.editable ? 'pl-4':''">
+        <v-list-item
+          @click="openDialogSubItem(i, -1)"
+          v-if="$store.state.editable"
+        >
+          <v-list-item-icon :class="$store.state.editable ? 'pl-4' : ''">
             <v-icon>mdi-plus</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
@@ -79,9 +108,13 @@
       <v-card>
         <v-card-title>
           메인 아이템 수정
-          <v-spacer/>
-          <v-btn @click="saveItem" icon color="success"><v-icon>mdi-content-save</v-icon></v-btn>
-          <v-btn @click="dialogItem=false" icon><v-icon>mdi-close</v-icon></v-btn>
+          <v-spacer />
+          <v-btn @click="saveItem" icon color="success"
+            ><v-icon>mdi-content-save</v-icon></v-btn
+          >
+          <v-btn @click="dialogItem = false" icon
+            ><v-icon>mdi-close</v-icon></v-btn
+          >
         </v-card-title>
         <v-card-text>
           <v-row>
@@ -98,7 +131,12 @@
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-text-field v-model="formItem.title" label="아이템 이름" outlined hide-details></v-text-field>
+          <v-text-field
+            v-model="formItem.title"
+            label="아이템 이름"
+            outlined
+            hide-details
+          ></v-text-field>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -106,13 +144,27 @@
       <v-card>
         <v-card-title>
           서브 아이템 수정
-          <v-spacer/>
-          <v-btn @click="saveSubItem" icon color=""><v-icon>mdi-content-save</v-icon></v-btn>
-          <v-btn @click="dialogSubItem=false" icon><v-icon>mdi-close</v-icon></v-btn>
+          <v-spacer />
+          <v-btn @click="saveSubItem" icon color=""
+            ><v-icon>mdi-content-save</v-icon></v-btn
+          >
+          <v-btn @click="dialogSubItem = false" icon
+            ><v-icon>mdi-close</v-icon></v-btn
+          >
         </v-card-title>
         <v-card-text>
-          <v-text-field v-model="formSubItem.title" label="메뉴 이름" outlined required></v-text-field>
-          <v-text-field v-model="formSubItem.to" label="경로" outlined required></v-text-field>
+          <v-text-field
+            v-model="formSubItem.title"
+            label="메뉴 이름"
+            outlined
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="formSubItem.to"
+            label="경로"
+            outlined
+            required
+          ></v-text-field>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -120,8 +172,8 @@
 </template>
 <script>
 export default {
-  props: ['items'],
-  data () {
+  props: ["items"],
+  data() {
     return {
       loading: false,
       dialogItem: false,
@@ -129,77 +181,90 @@ export default {
       selectedItemIndex: 0,
       selectedSubItemIndex: 0,
       formItem: {
-        icon: 'mdi-crosshairs-question',
-        title: ''
+        icon: "mdi-crosshairs-question",
+        title: ""
       },
       formSubItem: {
-        title: '',
-        to: ''
+        title: "",
+        to: ""
       }
-    }
+    };
   },
   methods: {
-    async save () {
+    async save() {
       try {
-        this.loading = true
-        await this.$firebase.database().ref().child('site').child('menu').set(this.items)
+        this.loading = true;
+        await this.$firebase
+          .database()
+          .ref()
+          .child("site")
+          .child("menu")
+          .set(this.items);
       } finally {
-        this.dialogItem = false
-        this.dialogSubItem = false
-        this.loading = false
+        this.dialogItem = false;
+        this.dialogSubItem = false;
+        this.loading = false;
       }
     },
-    openDialogItem (index) {
-      this.selectedItemIndex = index
+    openDialogItem(index) {
+      this.selectedItemIndex = index;
       if (index < 0) {
-        this.formItem.icon = 'mdi-crosshairs-question'
-        this.formItem.title = ''
+        this.formItem.icon = "mdi-crosshairs-question";
+        this.formItem.title = "";
       } else {
-        this.formItem.icon = this.items[index].icon
-        this.formItem.title = this.items[index].title
+        this.formItem.icon = this.items[index].icon;
+        this.formItem.title = this.items[index].title;
       }
-      this.dialogItem = true
+      this.dialogItem = true;
     },
-    async saveItem () {
-      if (this.selectedItemIndex < 0) this.items.push(this.formItem)
+    async saveItem() {
+      if (this.selectedItemIndex < 0) this.items.push(this.formItem);
       else {
-        this.items[this.selectedItemIndex].icon = this.formItem.icon
-        this.items[this.selectedItemIndex].title = this.formItem.title
+        this.items[this.selectedItemIndex].icon = this.formItem.icon;
+        this.items[this.selectedItemIndex].title = this.formItem.title;
       }
-      this.save()
+      this.save();
     },
-    openDialogSubItem (index, subIndex) {
-      this.selectedItemIndex = index
-      this.selectedSubItemIndex = subIndex
+    openDialogSubItem(index, subIndex) {
+      this.selectedItemIndex = index;
+      this.selectedSubItemIndex = subIndex;
       if (subIndex < 0) {
-        this.formSubItem.title = ''
-        this.formSubItem.to = ''
+        this.formSubItem.title = "";
+        this.formSubItem.to = "";
       } else {
-        this.formSubItem.title = this.items[index].subItems[subIndex].title
-        this.formSubItem.to = this.items[index].subItems[subIndex].to
+        this.formSubItem.title = this.items[index].subItems[subIndex].title;
+        this.formSubItem.to = this.items[index].subItems[subIndex].to;
       }
-      this.dialogSubItem = true
+      this.dialogSubItem = true;
     },
-    async saveSubItem () {
+    async saveSubItem() {
       if (this.selectedSubItemIndex < 0) {
-        if (!this.items[this.selectedItemIndex].subItems) this.items[this.selectedItemIndex].subItems = []
-        this.items[this.selectedItemIndex].subItems.push({ title: this.formSubItem.title, to: this.formSubItem.to })
+        if (!this.items[this.selectedItemIndex].subItems)
+          this.items[this.selectedItemIndex].subItems = [];
+        this.items[this.selectedItemIndex].subItems.push({
+          title: this.formSubItem.title,
+          to: this.formSubItem.to
+        });
       } else {
-        this.items[this.selectedItemIndex].subItems[this.selectedSubItemIndex].title = this.formSubItem.title
-        this.items[this.selectedItemIndex].subItems[this.selectedSubItemIndex].to = this.formSubItem.to
+        this.items[this.selectedItemIndex].subItems[
+          this.selectedSubItemIndex
+        ].title = this.formSubItem.title;
+        this.items[this.selectedItemIndex].subItems[
+          this.selectedSubItemIndex
+        ].to = this.formSubItem.to;
       }
-      this.save()
+      this.save();
     },
-    moveItem (items, i, arrow) {
+    moveItem(items, i, arrow) {
       // const item = items.splice(i, 1)[0]
       // items.splice(i + arrow, 0, item)
-      items.splice(i + arrow, 0, ...items.splice(i, 1))
-      this.save()
+      items.splice(i + arrow, 0, ...items.splice(i, 1));
+      this.save();
     },
-    removeItem (items, i) {
-      items.splice(i, 1)
-      this.save()
+    removeItem(items, i) {
+      items.splice(i, 1);
+      this.save();
     }
   }
-}
+};
 </script>

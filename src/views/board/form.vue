@@ -3,7 +3,7 @@
     <v-form>
       <v-card :loading="loading">
         <v-toolbar color="accent" dense flat dark>
-          <v-toolbar-title>게시판 글 작성</v-toolbar-title>
+          <v-toolbar-title>게시판 정보 작성</v-toolbar-title>
           <v-spacer />
           <v-btn icon @click="$router.push('/board/' + document)"
             ><v-icon>mdi-arrow-left</v-icon></v-btn
@@ -12,11 +12,20 @@
         </v-toolbar>
         <v-card-text>
           <v-text-field
+            v-model="form.category"
+            outlined
+            label="종류"
+          ></v-text-field>
+          <v-text-field
             v-model="form.title"
             outlined
             label="제목"
           ></v-text-field>
-          <editor :initialValue="form.content" ref="editor"></editor>
+          <v-textarea
+            v-model="form.description"
+            outlined
+            label="설명"
+          ></v-textarea>
         </v-card-text>
       </v-card>
     </v-form>
@@ -29,18 +38,14 @@ export default {
     return {
       unsubscribe: null,
       form: {
+        category: "",
         title: "",
-        content: ""
+        description: ""
       },
       exists: false,
       loading: false,
       ref: null
     };
-  },
-  computed: {
-    articleId() {
-      return this.$route.query.articleId;
-    }
   },
   watch: {
     document() {
@@ -55,63 +60,40 @@ export default {
   },
   methods: {
     subscribe() {
+      if (this.unsubscribe) this.unsubscribe();
       this.ref = this.$firebase
         .firestore()
         .collection("boards")
         .doc(this.document);
-      console.log(this.articleId);
-      if (!this.articleId) return;
-      if (this.unsubscribe) this.unsubscribe();
-      this.unsubscribe = this.ref
-        .collection("articles")
-        .doc(this.articleId)
-        .onSnapshot(doc => {
-          this.exists = doc.exists;
-          if (this.exists) {
-            const item = doc.data();
-            this.form.title = item.title;
-          }
-        });
+      this.unsubscribe = this.ref.onSnapshot(doc => {
+        this.exists = doc.exists;
+        if (this.exists) {
+          const item = doc.data();
+          this.form.category = item.category;
+          this.form.title = item.title;
+          this.form.description = item.description;
+        }
+      });
     },
     async save() {
+      const form = {
+        category: this.form.category,
+        title: this.form.title,
+        description: this.form.description,
+        updatedAt: new Date()
+      };
       this.loading = true;
       try {
-        const createdAt = new Date();
-        const id = createdAt.getTime().toString();
-        const md = this.$refs.editor.invoke("getMarkdown");
-        const sn = await this.$firebase
-          .storage()
-          .ref()
-          .child("boards")
-          .child(this.document)
-          .child(id + ".md")
-          .putString(md);
-        const url = await sn.ref.getDownloadURL();
-        const doc = {
-          title: this.form.title,
-          updatedAt: createdAt,
-          url: url
-        };
-
-        const batch = await this.$firebase.firestore().batch();
-
-        if (!this.articleId) {
-          doc.createdAt = createdAt;
-          doc.commentCount = 0;
-          batch.set(this.ref.collection("articles").doc(id), doc);
-          batch.update(this.ref, {
-            count: this.$firebase.firestore.FieldValue.increment(1)
-          });
+        if (!this.exists) {
+          form.createdAt = new Date();
+          form.count = 0;
+          await this.ref.set(form);
         } else {
-          batch.update(
-            this.ref.collection("articles").doc(this.articleId),
-            doc
-          );
+          this.ref.update(form);
         }
-        await batch.commit();
+        this.$router.push("/board/" + this.document);
       } finally {
         this.loading = false;
-        this.$router.push("/board/" + this.document);
       }
     }
   }

@@ -3,80 +3,92 @@
     <v-app-bar app color="primary" dark>
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <site-title :title="site.title"></site-title>
-      <v-spacer/>
+      <v-spacer />
       <site-sign></site-sign>
     </v-app-bar>
     <v-navigation-drawer app v-model="drawer" width="400">
       <site-menu :items="site.menu"></site-menu>
     </v-navigation-drawer>
     <v-content>
-      <router-view/>
+      <router-view />
     </v-content>
     <site-footer :footer="site.footer"></site-footer>
   </v-app>
 </template>
 
 <script>
-import SiteTitle from '@/views/site/title'
-import SiteFooter from '@/views/site/footer'
-import SiteMenu from '@/views/site/menu'
-import SiteSign from '@/views/site/sign'
+import SiteTitle from "@/views/site/title";
+import SiteFooter from "@/views/site/footer";
+import SiteMenu from "@/views/site/menu";
+import SiteSign from "@/views/site/sign";
 
 export default {
   components: { SiteTitle, SiteFooter, SiteMenu, SiteSign },
-  name: 'App',
-  data () {
+  name: "App",
+  data() {
     return {
       drawer: false,
       site: {
         menu: [
           {
-            title: 'home',
-            icon: 'mdi-home',
+            title: "home",
+            icon: "mdi-home",
             subItems: [
               {
-                title: 'Dashboard',
-                to: '/'
+                title: "Dashboard",
+                to: "/"
               },
               {
-                title: 'About',
-                to: '/about'
+                title: "About",
+                to: "/about"
               }
             ]
           },
           {
-            title: 'about',
+            title: "about",
             active: true,
-            icon: 'mdi-account',
+            icon: "mdi-account",
             subItems: [
               {
-                title: 'xxx',
-                to: '/xxx'
+                title: "xxx",
+                to: "/xxx"
               }
             ]
           }
         ],
-        title: '나의 타이틀입니다',
-        footer: '푸터입니다'
+        title: "나의 타이틀입니다",
+        footer: "푸터입니다"
       }
-    }
+    };
   },
-  created () {
-    this.subscribe()
+  created() {
+    this.subscribe();
   },
   methods: {
-    subscribe () {
-      this.$firebase.database().ref().child('site').on('value', (sn) => {
-        const v = sn.val()
-        if (!v) {
-          this.$firebase.database().ref().child('site').set(this.site)
-          return
-        }
-        this.site = v
-      }, (e) => {
-        console.log(e.message)
-      })
+    subscribe() {
+      this.$firebase
+        .database()
+        .ref()
+        .child("site")
+        .on(
+          "value",
+          sn => {
+            const v = sn.val();
+            if (!v) {
+              this.$firebase
+                .database()
+                .ref()
+                .child("site")
+                .set(this.site);
+              return;
+            }
+            this.site = v;
+          },
+          e => {
+            console.log(e.message);
+          }
+        );
     }
   }
-}
+};
 </script>
