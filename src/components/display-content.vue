@@ -31,6 +31,7 @@
     </v-card-actions>
     <v-divider />
     <display-comment
+      :article="item"
       :docRef="this.ref.collection('articles').doc(this.item.id)"
     ></display-comment>
   </v-card>
