@@ -66,6 +66,9 @@ export default {
     },
     user() {
       return this.$store.state.user;
+    },
+    fireUser() {
+      return this.$store.state.fireUser;
     }
   },
   watch: {
@@ -96,6 +99,7 @@ export default {
       this.form.content = data;
     },
     async save() {
+      if (!this.fireUser) throw Error("로그인이 필요합니다");
       this.loading = true;
       try {
         const createdAt = new Date();
@@ -106,6 +110,7 @@ export default {
           .ref()
           .child("boards")
           .child(this.document)
+          .child(this.fireUser.uid)
           .child(id + ".md")
           .putString(md);
         const url = await sn.ref.getDownloadURL();
