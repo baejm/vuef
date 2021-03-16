@@ -2,8 +2,8 @@
   <v-sheet>
     <v-subheader>
       editor
-      <v-spacer />
-      <v-btn @click="toggle = !toggle">toggle</v-btn>
+      <v-spacer/>
+      <v-btn @click="toggle=!toggle">toggle</v-btn>
       <v-btn @click="read">read</v-btn>
     </v-subheader>
     <editor :options="options" :initialValue="text" ref="editor"></editor>
@@ -12,20 +12,20 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     return {
       options: {
-        language: "ko"
+        language: 'ko'
       },
-      text: "# abcdefg",
+      text: '# abcdefg',
       toggle: false
-    };
+    }
   },
   methods: {
-    read() {
-      this.text = this.$refs.editor.invoke("getMarkdown");
-      alert(this.$refs.editor.invoke("getMarkdown"));
+    read () {
+      this.text = this.$refs.editor.invoke('getMarkdown')
+      alert(this.$refs.editor.invoke('getMarkdown'))
     }
   }
-};
+}
 </script>
