@@ -6,6 +6,7 @@
       </v-toolbar-title>
       <v-spacer />
       <v-btn @click="articleWrite" icon><v-icon>mdi-pencil</v-icon></v-btn>
+      <v-btn @click="remove" icon><v-icon>mdi-delete</v-icon></v-btn>
       <v-btn @click="$emit('close')" icon><v-icon>mdi-close</v-icon></v-btn>
     </v-toolbar>
     <v-card-text>
@@ -39,7 +40,11 @@ export default {
   props: ["document", "item"],
   data() {
     return {
-      content: ""
+      content: "",
+      ref: this.$firebase
+        .firestore()
+        .collection("boards")
+        .doc(this.document)
     };
   },
   mounted() {
@@ -49,10 +54,7 @@ export default {
     async fetch() {
       const r = await axios.get(this.item.url);
       this.content = r.data;
-      await this.$firebase
-        .firestore()
-        .collection("boards")
-        .doc(this.document)
+      await this.ref
         .collection("articles")
         .doc(this.item.id)
         .update({
@@ -64,6 +66,22 @@ export default {
         path: this.$route.path + "/article-write",
         query: { articleId: this.item.id }
       });
+    },
+    async remove() {
+      const batch = this.$firebase.firestore().batch();
+      batch.update(this.ref, {
+        count: this.$firebase.firestore.FieldValue.increment(-1)
+      });
+      batch.delete(this.ref.collection("articles").doc(this.item.id));
+      await batch.commit();
+      await this.$firebase
+        .storage()
+        .ref()
+        .child("boards")
+        .child(this.document)
+        .child(this.item.id + ".md")
+        .delete();
+      this.$emit("close");
     }
   }
 };
