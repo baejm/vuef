@@ -6,18 +6,12 @@
       <v-card>
         <v-card-title>
           제목 수정
-          <v-spacer />
+          <v-spacer/>
           <v-btn icon @click="save"><v-icon>mdi-content-save</v-icon></v-btn>
-          <v-btn icon @click="dialog = false"><v-icon>mdi-close</v-icon></v-btn>
+          <v-btn icon @click="dialog=false"><v-icon>mdi-close</v-icon></v-btn>
         </v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="text"
-            outlined
-            label="제목"
-            @keypress.enter="save"
-            hide-details
-          />
+          <v-text-field v-model="text" outlined label="제목" @keypress.enter="save" hide-details />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -25,29 +19,25 @@
 </template>
 <script>
 export default {
-  props: ["title"],
-  data() {
+  props: ['title'],
+  data () {
     return {
       dialog: false,
       text: this.title
-    };
+    }
   },
   methods: {
-    openDialog() {
-      this.dialog = true;
-      this.text = this.title;
+    openDialog () {
+      this.dialog = true
+      this.text = this.title
     },
-    async save() {
+    async save () {
       try {
-        await this.$firebase
-          .database()
-          .ref()
-          .child("site")
-          .update({ title: this.text });
+        await this.$firebase.database().ref().child('site').update({ title: this.text })
       } finally {
-        this.dialog = false;
+        this.dialog = false
       }
     }
   }
-};
+}
 </script>

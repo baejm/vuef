@@ -3,17 +3,17 @@
   <board-form v-else :boardId="info" :action="action" />
 </template>
 <script>
-import BoardInfo from "@/components/board/info";
-import BoardForm from "@/components/board/form";
+import BoardInfo from '@/components/board/info'
+import BoardForm from '@/components/board/form'
 export default {
   components: { BoardInfo, BoardForm },
   computed: {
-    info() {
-      return this.$route.params.info;
+    info () {
+      return this.$route.params.info
     },
-    action() {
-      return this.$route.query.action;
+    action () {
+      return this.$route.query.action
     }
   }
-};
+}
 </script>
