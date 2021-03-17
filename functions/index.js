@@ -143,7 +143,7 @@ exports.onDeleteBoardArticle = functions
     const ps = [];
     ps.push("boards");
     ps.push(context.params.bid);
-    ps.push(context.params.aid + ".md");
+    ps.push(context.params.aid + "-" + snap.data().uid + ".md");
 
     await admin
       .storage()
