@@ -1,15 +1,19 @@
 <template>
   <v-container fluid v-if="items.length">
     <template v-for="(item, i) in items">
-      <v-card
-        :key="item.id"
-        :class="i < items.length - 1 ? 'mb-4' : ''"
-        :to="`${boardId}/${item.id}`"
-      >
+      <v-card :key="item.id" :class="i < items.length - 1 ? 'mb-4' : ''">
         <v-subheader>
-          <v-chip color="info" label small class="mr-4">{{
-            item.category
-          }}</v-chip>
+          <!-- <v-chip color="info" label small class="mr-4">{{item.category}}</v-chip> -->
+          <v-btn
+            v-if="category != item.category"
+            color="info"
+            depressed
+            small
+            class="mr-4"
+            :to="`${$route.path}?category=${item.category}`"
+          >
+            {{ item.category }}
+          </v-btn>
           <display-time :time="item.createdAt"></display-time>
           <v-spacer />
           <v-btn
@@ -19,17 +23,20 @@
             ><v-icon>mdi-pencil</v-icon></v-btn
           >
         </v-subheader>
-        <v-card-title>
-          {{ item.title }}
-        </v-card-title>
-        <v-card-text>
-          <viewer v-if="item.summary" :initialValue="item.summary"></viewer>
-          <v-container v-else>
-            <v-row justify="center" align="center">
-              <v-progress-circular indeterminate></v-progress-circular>
-            </v-row>
-          </v-container>
-        </v-card-text>
+
+        <v-card color="transparent" flat :to="`${boardId}/${item.id}`">
+          <v-card-title>
+            {{ item.title }}
+          </v-card-title>
+          <v-card-text>
+            <viewer v-if="item.summary" :initialValue="item.summary"></viewer>
+            <v-container v-else>
+              <v-row justify="center" align="center">
+                <v-progress-circular indeterminate></v-progress-circular>
+              </v-row>
+            </v-container>
+          </v-card-text>
+        </v-card>
         <v-card-actions>
           <display-user :user="item.user"></display-user>
           <v-spacer />
@@ -66,7 +73,8 @@
   </v-container>
   <v-container fluid v-else>
     <v-alert type="warning" border="left" class="mb-0">
-      게시물이 없습니다
+      게시물이 없습니다 <v-icon>mdi-plus</v-icon> 버튼을 눌러서 게시물을
+      작성하세요~
     </v-alert>
   </v-container>
 </template>
@@ -79,7 +87,7 @@ const LIMIT = 5;
 
 export default {
   components: { DisplayTime, DisplayUser },
-  props: ["board", "boardId"],
+  props: ["board", "boardId", "category"],
   data() {
     return {
       items: [],
@@ -98,6 +106,9 @@ export default {
   },
   watch: {
     boardId() {
+      this.subscribe();
+    },
+    category() {
       this.subscribe();
     }
   },
@@ -142,14 +153,25 @@ export default {
     subscribe(arrow) {
       if (this.unsubscribe) this.unsubscribe();
       this.items = [];
-      this.ref = this.$firebase
-        .firestore()
-        .collection("boards")
-        .doc(this.boardId)
-        .collection("articles")
-        .orderBy(this.order, this.sort)
-        .limit(LIMIT);
-
+      if (!this.category) {
+        this.ref = this.$firebase
+          .firestore()
+          .collection("boards")
+          .doc(this.boardId)
+          .collection("articles")
+          .orderBy(this.order, this.sort)
+          .limit(LIMIT);
+      } else {
+        this.ref = this.$firebase
+          .firestore()
+          .collection("boards")
+          .doc(this.boardId)
+          .collection("articles")
+          .where("category", "==", this.category)
+          .orderBy(this.order, this.sort)
+          .limit(LIMIT);
+      }
+      console.log(arrow);
       this.unsubscribe = this.ref.onSnapshot(sn => {
         if (sn.empty) {
           this.items = [];
@@ -157,7 +179,6 @@ export default {
         }
         this.snapshotToItems(sn);
       });
-      console.log(arrow);
     },
     read(item) {
       this.$router.push({ path: this.$route.path + "/" + item.id });
