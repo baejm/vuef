@@ -3,14 +3,14 @@
     <v-card v-if="article">
       <v-toolbar color="info" dark dense flat>
         <v-toolbar-title>
-          {{article.title}}
+          {{ article.title }}
         </v-toolbar-title>
-        <v-spacer/>
+        <v-spacer />
         <v-btn @click="articleWrite" icon><v-icon>mdi-pencil</v-icon></v-btn>
         <v-btn @click="remove" icon><v-icon>mdi-delete</v-icon></v-btn>
         <v-btn @click="back" icon><v-icon>mdi-close</v-icon></v-btn>
       </v-toolbar>
-      <v-card-text >
+      <v-card-text>
         <viewer v-if="content" :initialValue="content"></viewer>
         <v-container v-else>
           <v-row justify="center" align="center">
@@ -19,25 +19,47 @@
         </v-container>
       </v-card-text>
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <span class="font-italic caption">
           작성일: <display-time :time="article.createdAt"></display-time>
         </span>
       </v-card-actions>
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <span class="font-italic caption">
           수정일: <display-time :time="article.updatedAt"></display-time>
         </span>
       </v-card-actions>
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <v-btn icon @click="like">
           <v-icon :color="liked ? 'success' : ''">mdi-thumb-up</v-icon>
-          <span>{{article.likeCount}}</span>
+          <span>{{ article.likeCount }}</span>
         </v-btn>
       </v-card-actions>
-      <v-divider/>
+      <v-divider />
+      <v-card-actions class="py-0">
+        <v-row no-gutters>
+          <v-col cols="4">
+            <v-btn text block color="primary" @click="go(-1)"
+              ><v-icon left>mdi-menu-left</v-icon> 이전</v-btn
+            >
+          </v-col>
+          <v-col cols="4" class="d-flex">
+            <v-divider vertical />
+            <v-btn text block color="primary" @click="back"
+              ><v-icon left>mdi-format-list-bulleted</v-icon> 목록</v-btn
+            >
+            <v-divider vertical />
+          </v-col>
+          <v-col cols="4">
+            <v-btn text block color="primary" @click="go(1)"
+              ><v-icon left>mdi-menu-right</v-icon> 다음</v-btn
+            >
+          </v-col>
+        </v-row>
+      </v-card-actions>
+      <v-divider />
       <display-comment :article="article" :docRef="ref"></display-comment>
     </v-card>
     <v-card v-else>
@@ -48,90 +70,131 @@
       </v-container>
     </v-card>
   </v-container>
-
 </template>
 <script>
-import axios from 'axios'
-import DisplayTime from '@/components/display-time'
-import DisplayComment from '@/components/display-comment'
+import axios from "axios";
+import DisplayTime from "@/components/display-time";
+import DisplayComment from "@/components/display-comment";
 
 export default {
   components: { DisplayTime, DisplayComment },
-  props: ['boardId', 'articleId'],
-  data () {
+  props: ["boardId", "articleId"],
+  data() {
     return {
-      content: '',
-      ref: this.$firebase.firestore().collection('boards').doc(this.boardId).collection('articles').doc(this.articleId),
+      content: "",
+      ref: null,
       unsubscribe: null,
-      article: null
-    }
+      article: null,
+      doc: null
+    };
   },
   computed: {
-    fireUser () {
-      return this.$store.state.fireUser
+    fireUser() {
+      return this.$store.state.fireUser;
     },
-    liked () {
-      if (!this.fireUser) return false
-      return this.article.likeUids.includes(this.fireUser.uid)
+    liked() {
+      if (!this.fireUser) return false;
+      return this.article.likeUids.includes(this.fireUser.uid);
     }
   },
-  async created () {
-    await this.readCountUpdate()
-    this.subscribe()
+  watch: {
+    articleId() {
+      this.subscribe();
+    }
   },
-  destroyed () {
-    if (this.unsubscribe) this.unsubscribe()
+  created() {
+    this.subscribe();
+  },
+  destroyed() {
+    if (this.unsubscribe) this.unsubscribe();
   },
   methods: {
-    async readCountUpdate () {
-      await this.ref.update({
+    subscribe() {
+      if (this.unsubscribe) this.unsubscribe();
+      this.ref = this.$firebase
+        .firestore()
+        .collection("boards")
+        .doc(this.boardId)
+        .collection("articles")
+        .doc(this.articleId);
+      this.ref.update({
         readCount: this.$firebase.firestore.FieldValue.increment(1)
-      })
-    },
-    subscribe () {
-      if (this.unsubscribe) this.unsubscribe()
+      });
       this.unsubscribe = this.ref.onSnapshot(doc => {
         if (!doc.exists) {
-          this.back()
-          return
+          this.back();
+          return;
         }
-        const item = doc.data()
-        item.createdAt = item.createdAt.toDate()
-        item.updatedAt = item.updatedAt.toDate()
-        if (!this.article || this.article.url !== item.url) this.fetch(item.url)
-        this.article = item
-      }, console.error)
+        this.doc = doc;
+        const item = doc.data();
+        item.createdAt = item.createdAt.toDate();
+        item.updatedAt = item.updatedAt.toDate();
+        if (!this.article || this.article.url !== item.url)
+          this.fetch(item.url);
+        this.article = item;
+      }, console.error);
     },
-    async fetch (url) {
-      this.content = ''
-      const r = await axios.get(url)
-      this.content = typeof r.data === 'string' ? r.data : r.data.toString()
+    async fetch(url) {
+      this.content = "";
+      const r = await axios.get(url);
+      this.content = typeof r.data === "string" ? r.data : r.data.toString();
     },
-    async articleWrite () {
-      this.$router.push({ path: this.$route.path, query: { action: 'write' } })
+    async articleWrite() {
+      this.$router.push({ path: this.$route.path, query: { action: "write" } });
     },
-    async remove () {
-      await this.ref.delete()
+    async remove() {
+      await this.ref.delete();
     },
-    back () {
-      const us = this.$route.path.split('/')
-      us.pop()
-      this.$router.push({ path: us.join('/') })
+    back() {
+      const us = this.$route.path.split("/");
+      us.pop();
+      this.$router.push({ path: us.join("/") });
     },
-    async like () {
-      if (!this.fireUser) throw Error('로그인이 필요합니다')
+    async like() {
+      if (!this.fireUser) throw Error("로그인이 필요합니다");
       if (this.liked) {
         await this.ref.update({
           likeCount: this.$firebase.firestore.FieldValue.increment(-1),
-          likeUids: this.$firebase.firestore.FieldValue.arrayRemove(this.fireUser.uid)
-        })
+          likeUids: this.$firebase.firestore.FieldValue.arrayRemove(
+            this.fireUser.uid
+          )
+        });
       } else {
         await this.ref.update({
           likeCount: this.$firebase.firestore.FieldValue.increment(1),
-          likeUids: this.$firebase.firestore.FieldValue.arrayUnion(this.fireUser.uid)
-        })
+          likeUids: this.$firebase.firestore.FieldValue.arrayUnion(
+            this.fireUser.uid
+          )
+        });
       }
+    },
+    async go(arrow) {
+      if (!this.doc) throw Error("읽지 못했음");
+      const ref = this.$firebase
+        .firestore()
+        .collection("boards")
+        .doc(this.boardId)
+        .collection("articles")
+        .orderBy("createdAt", "desc");
+      let sn;
+      if (arrow < 0)
+        sn = await ref
+          .endBefore(this.doc)
+          .limitToLast(1)
+          .get();
+      else
+        sn = await ref
+          .startAfter(this.doc)
+          .limit(1)
+          .get();
+      if (sn.empty) throw Error("더이상 페이지가 없습니다");
+      const doc = sn.docs[0];
+
+      const us = this.$route.path.split("/");
+      us.pop();
+      us.push(doc.id);
+      this.$router.push({ path: us.join("/") });
     }
   }
-}
+};
 </script>
