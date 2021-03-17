@@ -22,8 +22,13 @@
         <v-card-title>
           {{ item.title }}
         </v-card-title>
-        <v-card-text class="text-content">
-          {{ item.summary }}
+        <v-card-text>
+          <viewer v-if="item.summary" :initialValue="item.summary"></viewer>
+          <v-container v-else>
+            <v-row justify="center" align="center">
+              <v-progress-circular indeterminate></v-progress-circular>
+            </v-row>
+          </v-container>
         </v-card-text>
         <v-card-actions>
           <display-user :user="item.user"></display-user>
@@ -48,7 +53,13 @@
       </v-card>
     </template>
     <v-list-item v-if="lastDoc && items.length < board.count">
-      <v-btn @click="more" v-intersect="onIntersect" text color="primary" block
+      <v-btn
+        @click="more"
+        v-intersect="onIntersect"
+        text
+        color="primary"
+        block
+        :loading="loading"
         >더보기</v-btn
       >
     </v-list-item>
@@ -63,6 +74,7 @@
 import { last } from "lodash";
 import DisplayTime from "@/components/display-time";
 import DisplayUser from "@/components/display-user";
+
 const LIMIT = 5;
 
 export default {
@@ -75,7 +87,8 @@ export default {
       ref: null,
       lastDoc: null,
       order: "createdAt",
-      sort: "desc"
+      sort: "desc",
+      loading: false
     };
   },
   computed: {
@@ -89,10 +102,6 @@ export default {
     }
   },
   created() {
-    const obj = {};
-    // obj.a = 3
-    // obj.b = 3
-    console.log(Object.keys(obj).length);
     this.subscribe();
   },
   destroyed() {
@@ -110,8 +119,13 @@ export default {
           item.updatedAt = item.updatedAt.toDate();
           this.items.push(item);
         } else {
+          if (findItem.summary !== item.summary) {
+            findItem.summary = "";
+            setTimeout(() => {
+              findItem.summary = item.summary;
+            }, 1000);
+          }
           findItem.title = item.title;
-          findItem.summary = item.summary;
           findItem.readCount = item.readCount;
           findItem.commentCount = item.commentCount;
           findItem.likeCount = item.likeCount;
@@ -127,6 +141,7 @@ export default {
     },
     subscribe(arrow) {
       if (this.unsubscribe) this.unsubscribe();
+      this.items = [];
       this.ref = this.$firebase
         .firestore()
         .collection("boards")
@@ -149,8 +164,14 @@ export default {
     },
     async more() {
       if (!this.lastDoc) throw Error("더이상 데이터가 없습니다");
-      const sn = await this.ref.startAfter(this.lastDoc).get();
-      this.snapshotToItems(sn);
+      if (this.loading) return;
+      this.loading = true;
+      try {
+        const sn = await this.ref.startAfter(this.lastDoc).get();
+        this.snapshotToItems(sn);
+      } finally {
+        this.loading = false;
+      }
     },
     onIntersect(entries, observer, isIntersecting) {
       if (isIntersecting) this.more();
