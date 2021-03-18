@@ -187,7 +187,6 @@ import DisplayUser from "@/components/display-user";
 import DisplayTitle from "@/components/display-title";
 import DisplayCount from "@/components/display-count";
 import getSummary from "@/util/getSummary";
-import newCheck from "@/util/newCheck";
 import addYoutubeIframe from "@/util/addYoutubeIframe";
 
 const LIMIT = 5;
@@ -210,7 +209,6 @@ export default {
       sort: "desc",
       loading: false,
       getSummary,
-      newCheck,
       loaded: false
     };
   },
@@ -291,7 +289,6 @@ export default {
           .orderBy(this.order, this.sort)
           .limit(LIMIT);
       }
-      console.log(arrow);
       this.loaded = false;
       this.unsubscribe = this.ref.onSnapshot(sn => {
         this.loaded = true;
