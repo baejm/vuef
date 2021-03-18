@@ -282,7 +282,7 @@ export default {
           .orderBy(this.order, this.sort)
           .limit(LIMIT);
       }
-
+      console.log(arrow);
       this.unsubscribe = this.ref.onSnapshot(sn => {
         if (sn.empty) {
           this.items = [];
