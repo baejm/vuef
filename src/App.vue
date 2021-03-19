@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="primary" dark :clipped-left="$vuetify.breakpoint.lgAndUp">
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <site-title :title="site.title"></site-title>
       <v-spacer/>
@@ -10,6 +10,7 @@
     <v-navigation-drawer
       app
       v-model="drawer"
+      :clipped="$vuetify.breakpoint.lgAndUp"
       :width="$store.state.editable ? 380 : null"
       >
       <!-- :width="$store.state.editable ? 380 : null" -->
@@ -38,33 +39,22 @@ export default {
       site: {
         menu: [
           {
-            title: 'home',
+            title: '메뉴 로드중 ...',
             icon: 'mdi-home',
             subItems: [
               {
-                title: 'Dashboard',
-                to: '/'
-              },
-              {
-                title: 'About',
-                to: '/about'
+                title: '홈',
+                to: '/',
+                createdAt: new Date('2000-01-01'),
+                level: 5
               }
-            ]
-          },
-          {
-            title: 'about',
-            active: true,
-            icon: 'mdi-account',
-            subItems: [
-              {
-                title: 'xxx',
-                to: '/xxx'
-              }
-            ]
+            ],
+            createdAt: new Date('2000-01-01'),
+            level: 5
           }
         ],
-        title: '나의 타이틀입니다',
-        footer: '푸터입니다'
+        title: '타이틀 로드중 ...',
+        footer: '바닥 로드중 ...'
       }
     }
   },
