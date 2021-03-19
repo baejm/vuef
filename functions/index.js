@@ -29,8 +29,8 @@ exports.createUser = functions.region(region).auth.user().onCreate(async (user) 
   const time = new Date()
   const u = {
     email,
-    displayName,
-    photoURL,
+    displayName: displayName || '손님',
+    photoURL: photoURL || '/user.png',
     createdAt: time,
     level: email === functions.config().admin.email ? 0 : 5,
     visitedAt: time,
@@ -60,6 +60,15 @@ exports.onCreateBoard = functions.region(region).firestore
     } catch (e) {
       await db.collection('meta').doc('boards').set({ count: 1 })
     }
+    await index.setSettings({
+      searchableAttributes: [
+        'title',
+        'unordered(content)',
+        'category',
+        'tags',
+        'displayName'
+      ]
+    })
   })
 
 exports.onDeleteBoard = functions.region(region).firestore
@@ -112,7 +121,7 @@ exports.onCreateBoardArticle = functions.region(region).firestore
     const doc = snap.data()
 
     let content = doc.summary
-    if (doc.summary && doc.summary.length >= 300) {
+    if (doc.summary && doc.summary.length >= 3000) { // todo: 테스트중 전체 게시물일 때 300으로..
       const ps = []
       ps.push('boards')
       ps.push(context.params.bid)
@@ -120,7 +129,7 @@ exports.onCreateBoardArticle = functions.region(region).firestore
       const bf = await admin.storage().bucket().file(ps.join('/'))
         .download()
         .catch(e => console.error('storage download err: ' + e.message))
-      content = bf.toString()
+      content = bf.toString().substr(0, 5000) // reason: https://www.algolia.com/doc/faq/indexing/how-do-i-reduce-the-size-of-my-records/
     }
 
     const algoliaDoc = {
@@ -262,7 +271,7 @@ exports.onUpdateBoardArticle = functions.region(region).firestore
     if (!isEqual(beforeDoc.tags, doc.tags)) algoliaDoc.tags = doc.tags
 
     let content = doc.summary
-    if (doc.summary && doc.summary.length >= 300) {
+    if (doc.summary && doc.summary.length >= 3000) { // todo: 테스트중 전체 게시물일 때 300으로..
       const ps = []
       ps.push('boards')
       ps.push(context.params.bid)
@@ -270,7 +279,7 @@ exports.onUpdateBoardArticle = functions.region(region).firestore
       const bf = await admin.storage().bucket().file(ps.join('/'))
         .download()
         .catch(e => console.error('storage download err: ' + e.message))
-      content = bf.toString()
+      content = bf.toString().substr(0, 5000) // reason: https://www.algolia.com/doc/faq/indexing/how-do-i-reduce-the-size-of-my-records/
     }
     if (beforeDoc.summary !== content) algoliaDoc.content = content
 
@@ -377,11 +386,11 @@ exports.seo = functions.https.onRequest(async (req, res) => {
 
   const ps = req.path.split('/')
   ps.shift()
-  // ps.forEach((v, i) => console.log(i, v))
   if (ps.length !== 3) return res.send(html)
   const mainCollection = pluralize(ps.shift())
   const board = ps.shift()
   const article = ps.shift()
+  if (!article) return res.send(html)
 
   const doc = await db.collection(mainCollection).doc(board).collection('articles').doc(article).get()
 
@@ -396,8 +405,36 @@ exports.seo = functions.https.onRequest(async (req, res) => {
   const ogImageNode = child.childNodes[4]
 
   const title = item.title + ' : memi'
-  const description = item.summary.substr(0, 80)
-  const image = item.images.length ? item.images[0].thumbUrl : '/logo.png'
+  const description = item.summary.substr(0, 80).replace(/(<([^>]+)>)/gi, '')
+
+  const getImageUrlFromMd = (md) => {
+    const ds = md.split('\n')
+    for (const d of ds) {
+      const us = d.split('](')
+      if (us.length !== 2) continue
+      if (us[0].indexOf('!') < 0) continue
+      const i = us[1].indexOf(')')
+      return us[1].substr(0, i)
+    }
+  }
+  let imgSrc = '/logo.png'
+  if (item.images.length) imgSrc = item.images[0].thumbUrl
+  else {
+    let content = item.summary
+    if (item.summary && item.summary.length >= 300) { // todo: 테스트중 전체 게시물일 때 300으로..
+      const ps = []
+      ps.push(mainCollection)
+      ps.push(board)
+      ps.push(article + '-' + item.uid + '.md')
+      const bf = await admin.storage().bucket().file(ps.join('/'))
+        .download()
+        .catch(e => console.error('storage download err: ' + e.message))
+      content = bf.toString()
+    }
+    const src = getImageUrlFromMd(content)
+    if (src) imgSrc = src
+  }
+  const image = imgSrc
   titleNode.set_content(title)
   descriptionNode.setAttribute('content', description)
   ogTitleNode.setAttribute('content', title)
