@@ -10,28 +10,24 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     return {
       empty: false,
       loaded: false
-    };
+    }
   },
-  mounted() {
-    this.goPage();
+  mounted () {
+    this.goPage()
   },
   methods: {
-    async goPage() {
-      const sn = await this.$firebase
-        .firestore()
-        .collection("boards")
-        .orderBy("count", "desc")
-        .limit(1)
-        .get();
-      this.loaded = true;
-      if (sn.empty) return;
-      this.empty = sn.empty;
-      this.$router.push("/board/" + sn.docs[0].id);
+    async goPage () {
+      const sn = await this.$firebase.firestore()
+        .collection('boards').orderBy('count', 'desc').limit(1).get()
+      this.loaded = true
+      if (sn.empty) return
+      this.empty = sn.empty
+      this.$router.push('/board/' + sn.docs[0].id)
     }
   }
-};
+}
 </script>
