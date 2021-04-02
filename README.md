@@ -34,5 +34,5 @@ vuetify와 firebase를 이용하여 서버에 연동시켜 로그인 후에
 - "vuetify-toast-snackbar": "^0.6.1",
 - "vuex": "^3.4.0",
 - "youtube-url": "^0.5.0"
-- 
+
 ```
