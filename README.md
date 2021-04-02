@@ -17,7 +17,7 @@ vuetify와 firebase를 이용하여 서버에 연동시켜 로그인 후에
 모바일 반응형에 대응
 ```
 
-## Installation
+## 설치
 ```
 
 - "@toast-ui/vue-editor": "^2.5.1",
