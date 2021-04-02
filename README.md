@@ -21,4 +21,9 @@ vuetify와 firebase를 이용하여 서버에 연동시켜 로그인 후에
 ```
  - vuetify
  - firebase
+ - youtube-url
+ - vue-toasted
+ - moment
+ - browser-image-resizer
+ - axios
 ```
