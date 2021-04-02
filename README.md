@@ -19,6 +19,7 @@ vuetify와 firebase를 이용하여 서버에 연동시켜 로그인 후에
 
 ## Installation
 ```
+
 - "@toast-ui/vue-editor": "^2.5.1",
 - "axios": "^0.21.1",
 - "browser-image-resizer": "^2.1.3",
@@ -33,4 +34,5 @@ vuetify와 firebase를 이용하여 서버에 연동시켜 로그인 후에
 - "vuetify-toast-snackbar": "^0.6.1",
 - "vuex": "^3.4.0",
 - "youtube-url": "^0.5.0"
+- 
 ```
